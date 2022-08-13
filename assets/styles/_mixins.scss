@@ -1,0 +1,11 @@
+@use "sass:color";
+
+@mixin events-btn-bg($color, $l-percent, $b-percent) {
+  &:hover {
+    background-color: color.scale($color, $lightness: $l-percent);
+  }
+
+  &:active {
+    background-color: color.scale($color, $blackness: $b-percent);
+  }
+}

@@ -76,6 +76,48 @@ export default {
           name: 'Людовико Эйнауди',
           descr: '',
           price: 10000
+        },
+        {
+          id: 7,
+          imgLink: 'https://i.pinimg.com/736x/f4/d2/96/f4d2961b652880be432fb9580891ed62.jpg',
+          name: 'Это котик',
+          descr: 'Описание скоро сделаем длинным',
+          price: 10000
+        },
+        {
+          id: 8,
+          imgLink: 'https://icdn.lenta.ru/images/2021/12/30/17/20211230175542538/square_1280_9852fabcde7147edee00deeafde2a2e0.jpg',
+          name: 'Тигр',
+          descr: 'ываджлдоыаволджыва вылдорлджыва',
+          price: 10000
+        },
+        {
+          id: 9,
+          imgLink: 'https://meloman.ru/media/upload/photos/Bethoven_3.820x350.jpg',
+          name: 'Бетховен',
+          descr: '',
+          price: 10000
+        },
+        {
+          id: 10,
+          imgLink: 'https://radior.lt/wp-content/uploads/2021/04/7-2.jpg',
+          name: 'Муххамад Али',
+          descr: '',
+          price: 10000
+        },
+        {
+          id: 11,
+          imgLink: 'https://2bitcoins.ru/wp-content/uploads/2021/08/peterson1.jpg',
+          name: 'Джордан Питерсон',
+          descr: '',
+          price: 10000
+        },
+        {
+          id: 12,
+          imgLink: 'https://neoclassica.ru/wp-content/uploads/2021/12/ludovico-einaudi-underwater-new-album-announce.jpeg',
+          name: 'Людовико Эйнауди',
+          descr: '',
+          price: 10000
         }
       ],
 
@@ -89,12 +131,12 @@ export default {
   },
   watch: {
     filterSelected() {
-      console.log(this.filterSelected)
+      // this.filterSelected
     }
   },
   methods: {
     changeSelectedFilter(val) {
-      console.log(val)
+      // val
     }
   }
 }

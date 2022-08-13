@@ -1,11 +1,19 @@
 <template>
   <li class="card">
+    <button class="card-del">
+      <img class="card-del__img" src="@/assets/images/delete.svg" alt="delete card" title="delete card">
+    </button>
     <picture class="card-img-wrapper">
       <img class="card-img" :src="imgUrl" :alt="name" :title="name">
     </picture>
     <span class="card-info">
       <span class="card-info__title">{{ name }}</span>
-      <p v-if="description" class="card-info__description">{{ description }}</p>
+      <p
+        v-if="description"
+        class="card-info__description"
+      >
+        {{ description }}
+      </p>
       <span class="card-info__price">{{ formattedPrice(price) }} руб.</span>
     </span>
   </li>
@@ -41,14 +49,42 @@ export default {
 </script>
 
 <style scoped lang="scss">
+@use "sass:color";
 @use "@/assets/styles/_params.scss";
 @use "@/assets/styles/_colors.scss";
+@use "@/assets/styles/_mixins.scss";
 
 .card {
+  position: relative;
   box-shadow: colors.$substrate-shadow;
   border-radius: params.$substrate-border-radius;
-  overflow: hidden;
+  overflow: visible;
   height: max-content;
+
+  &-del {
+    display: none;
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform: translate(9px, -8px);
+    border-radius: 10px;
+    background-color: colors.$important;
+    padding: 9px;
+    cursor: pointer;
+    border: none;
+    z-index: 2;
+    transition: 0.3s ease-out;
+
+    @include mixins.events-btn-bg(colors.$important, 10%, 5%);
+
+    &__img {
+      height: 16px;
+    }
+  }
+
+  &:hover &-del {
+    display: flex;
+  }
 
   &-img {
     width: 100%;
@@ -60,6 +96,7 @@ export default {
       display: block;
       overflow: hidden;
       position: relative;
+      border-radius: params.$substrate-border-radius params.$substrate-border-radius 0 0;
     }
   }
 

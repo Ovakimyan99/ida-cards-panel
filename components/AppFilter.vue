@@ -2,7 +2,7 @@
   <div class="filter-wrapper" @click="changeShowFilter">
     <div class="filter-header">
       <span
-        class="filter-active filter--select"
+        class="filter-active"
         :class="{'no-active': !Object.keys(selected).length}"
       >
         {{ selected?.text || 'По умолчанию' }}
@@ -21,7 +21,7 @@
         v-for="{value, text} of options"
         :key="value"
         :value="value"
-        class="filter-list__option filter--select"
+        class="filter-list__option"
         @click="changeSelect({ value, text })"
       >
         {{ text }}
@@ -45,6 +45,11 @@ export default {
       showFilter: false
     }
   },
+  watch: {
+    selected() {
+      this.changeShowFilter()
+    }
+  },
   methods: {
     changeSelect(option) {
       this.selected = option
@@ -52,12 +57,6 @@ export default {
     },
     changeShowFilter() {
       this.showFilter = !this.showFilter
-      console.log(2)
-    }
-  },
-  watch: {
-    selected() {
-      this.changeShowFilter()
     }
   }
 }
@@ -66,6 +65,12 @@ export default {
 <style scoped lang="scss">
 @use "@/assets/styles/_colors.scss";
 @use "@/assets/styles/_params.scss";
+
+%filter-select {
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 1.2;
+}
 
 .arrow {
   width: 5px;
@@ -116,13 +121,8 @@ export default {
     align-items: center;
   }
 
-  &--select {
-    font-weight: 400;
-    font-size: 12px;
-    line-height: 1.2;
-  }
-
   &-active {
+    @extend %filter-select;
     color: colors.$text;
 
     &.no-active {
@@ -141,6 +141,7 @@ export default {
     cursor: default;
 
     &__option {
+      @extend %filter-select;
       cursor: pointer;
       padding: 0 16px;
       color: colors.$placeholder;

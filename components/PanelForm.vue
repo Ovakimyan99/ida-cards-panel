@@ -1,29 +1,20 @@
 <template>
-  <form class="form">
-    <panel-form-field class="form-field" input-id="name-of-product" required>
-      <template #label>Наименование товара</template>
-      <template #input>
-        <panel-form-input id="name-of-product" placeholder="Введите наименование товара" />
-      </template>
-    </panel-form-field>
-    <panel-form-field class="form-field" input-id="product-description">
-      <template #label>Описание товара</template>
-      <template #input>
-        <panel-form-input id="product-description" type="textarea" placeholder="Введите описание товара" />
-      </template>
-    </panel-form-field>
-    <panel-form-field class="form-field" input-id="img-link" required>
-      <template #label>Ссылка на изображение товара</template>
-      <template #input>
-        <panel-form-input id="img-link" placeholder="Введите ссылку" />
-      </template>
-    </panel-form-field>
-    <panel-form-field class="form-field form-field--last" input-id="production-cost" required>
-      <template #label>Цена товара</template>
-      <template #input>
-        <panel-form-input id="production-cost" placeholder="Введите цену" />
-      </template>
-    </panel-form-field>
+  <form class="form" @submit.prevent>
+    <fieldset class="form-fieldset">
+      <panel-form-field
+        v-for="({id, type = 'input', placeholder, label, required = true}, idx) of formFields"
+        :key="id"
+        class="form-field"
+        :class="{ 'form-field--last': idx + 1 === formFields.length}"
+        :input-id="id"
+        :required="required"
+      >
+        <template #label>{{ label }}</template>
+        <template #input>
+          <panel-form-input :id="id" :type="type" :placeholder="placeholder" />
+        </template>
+      </panel-form-field>
+    </fieldset>
 
     <panel-form-button class="form-button">
       Добавить товар
@@ -33,7 +24,35 @@
 
 <script>
 export default {
-  name: 'PanelForm'
+  name: 'PanelForm',
+  data() {
+    return {
+      formFields: [
+        {
+          id: 'name-of-product',
+          label: 'Наименование товара',
+          placeholder: 'Введите наименование товара'
+        },
+        {
+          id: 'product-description',
+          type: 'textarea',
+          label: 'Описание товара',
+          placeholder: 'Введите описание товара',
+          required: false
+        },
+        {
+          id: 'img-link',
+          label: 'Ссылка на изображение товара',
+          placeholder: 'Введите ссылку'
+        },
+        {
+          id: 'production-cost',
+          label: 'Цена товара',
+          placeholder: 'Введите цену'
+        }
+      ]
+    }
+  }
 }
 </script>
 
@@ -46,6 +65,12 @@ export default {
   box-shadow: colors.$substrate-shadow;
   background-color: colors.$substrate-fon;
   border-radius: params.$substrate-border-radius;
+
+  &-fieldset {
+    padding: 0;
+    margin: 0;
+    border: none;
+  }
 
   &-field {
     margin-bottom: 16px;

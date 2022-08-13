@@ -1,16 +1,23 @@
 <template>
-  <input
-    v-if="type === 'input'"
-    :id="id"
-    :placeholder="placeholder"
-    class="form-input"
-  >
-  <textarea
-    v-else-if="type === 'textarea'"
-    :id="id"
-    :placeholder="placeholder"
-    class="form-input form-input--area"
-  />
+  <div class="form-input-wrapper">
+    <input
+      v-if="type === 'input'"
+      :id="id"
+      :placeholder="placeholder"
+      :class="{ error }"
+      class="form-input"
+    >
+    <textarea
+      v-else-if="type === 'textarea'"
+      :id="id"
+      :placeholder="placeholder"
+      class="form-input form-input--area"
+    />
+    <span class="form-input-error">
+      <!--  {{ error }}  -->
+      Поле является обязательным
+    </span>
+  </div>
 </template>
 
 <script>
@@ -31,12 +38,17 @@ export default {
     placeholder: {
       type: String,
       default: 'Заполните поле'
+    },
+    error: {
+      type: String,
+      default: ''
     }
   }
 }
 </script>
 
 <style scoped lang="scss">
+@use "sass:color";
 @use "@/assets/styles/_colors.scss";
 @use "@/assets/styles/_params.scss";
 
@@ -49,13 +61,38 @@ export default {
   font-size: 12px;
   line-height: 1;
   outline: none;
-  border: none;
   width: calc(100% - 32px);
+  border: 1px solid transparent;
+  transition: background-color 0.3s ease-in;
+
+  &:focus {
+    background-color: color.scale(colors.$substrate-fon, $blackness: 2%);
+  }
+
+  &.error {
+    border: 1px solid colors.$important;
+  }
+
+  &-wrapper {
+    position: relative;
+  }
 
   &--area {
-    max-width: calc(100% - 32px);
+    max-width: 252px;
+    width: 252px;
     min-width: calc(100% - 32px);
     min-height: calc(108px - 20px);
+  }
+
+  &-error {
+    font-weight: 400;
+    font-size: 8px;
+    line-height: 1.25;
+    color: colors.$important;
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    transform: translateY(100%);
   }
 
   &::placeholder {
