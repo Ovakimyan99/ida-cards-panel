@@ -19,6 +19,7 @@
     <div class="panel-products">
       <!--   Отображение фильтра   -->
       <app-filter
+        class="panel-filter"
         :options="filterOptions"
         @selectedFilter="changeSelectedFilter"
       />
@@ -190,6 +191,13 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+  }
+
+  &-filter {
+    @media (min-width: 960px) {
+      display: block;
+      margin-left: auto;
+    }
   }
 
   &-form-wrapper {
