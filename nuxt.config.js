@@ -24,6 +24,11 @@ export default {
     '~/assets/styles/main'
   ],
 
+  plugins: [
+    '~/plugins/numbers.client.js',
+    '~/plugins/validate.client.js'
+  ],
+
   buildModules: [
     // https://go.nuxtjs.dev/eslint
     '@nuxtjs/eslint-module'

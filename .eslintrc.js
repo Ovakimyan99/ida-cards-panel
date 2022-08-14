@@ -18,6 +18,7 @@ module.exports = {
   rules: {
     'space-before-function-paren': 0,
     'vue/singleline-html-element-content-newline': 0,
-    'arrow-parens': 0
+    'arrow-parens': 0,
+    curly: 0
   }
 }

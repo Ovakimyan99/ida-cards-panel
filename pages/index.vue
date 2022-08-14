@@ -1,20 +1,23 @@
 <template>
   <main ref="main" class="panel-wrapper container">
     <aside class="panel-form-wrapper">
+      <!--  Раздел добавления товаров  -->
       <div class="panel-form-picker">
-        <!--  Раздел добавления товаров  -->
         <div class="panel-form">
           <h2 class="panel-form__title">
             Добавление товара
           </h2>
+
           <!--  Форма добавления товаров  -->
           <panel-form />
         </div>
+
         <panel-form-button class="panel-form-close-btn">
           Закрыть форму
         </panel-form-button>
       </div>
     </aside>
+
     <!--  Товары  -->
     <div class="panel-products">
       <!--   Отображение фильтра   -->
@@ -23,11 +26,13 @@
         :options="filterOptions"
         @selectedFilter="changeSelectedFilter"
       />
+
       <!--   Мобилка: Бургер открытия формы   -->
       <app-burger
         class="panel__form-show"
         @click="changeShowForm"
       />
+
       <!--   Список карт   -->
       <div class="cards-list-wrapper">
         <ul class="cards-list">
@@ -46,7 +51,7 @@
 </template>
 
 <script>
-import { disableScroll, enablesScroll } from 'assets/js/windowScroll'
+import { disableScroll, enablesScroll } from '@/core/windowScroll'
 
 export default {
   name: 'IndexPage',

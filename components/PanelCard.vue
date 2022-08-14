@@ -14,7 +14,7 @@
       >
         {{ description }}
       </p>
-      <span class="card-info__price">{{ formattedPrice(price) }} руб.</span>
+      <span class="card-info__price">{{ $number.crushing(price) }} руб.</span>
     </span>
   </li>
 </template>
@@ -38,11 +38,6 @@ export default {
     price: {
       type: Number,
       required: true
-    }
-  },
-  methods: {
-    formattedPrice(val) {
-      return val
     }
   }
 }

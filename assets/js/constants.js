@@ -1,0 +1,3 @@
+// VALIDATION TYPES
+export const REQUIRED = 'REQUIRED'
+export const START_WITH = 'START_WITH'
