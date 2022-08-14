@@ -17,16 +17,19 @@ export default {
     ]
   },
 
-  css: [
-  ],
-
-  plugins: [
-  ],
-
   components: true,
+
+  css: [
+    'normalize.css/normalize.css',
+    '~/assets/styles/main'
+  ],
 
   buildModules: [
     // https://go.nuxtjs.dev/eslint
     '@nuxtjs/eslint-module'
-  ]
+  ],
+
+  build: {
+    postcss: null
+  }
 }
