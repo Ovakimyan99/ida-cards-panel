@@ -106,6 +106,7 @@ export default {
     display: flex;
     flex-direction: column;
     background-color: colors.$substrate-fon;
+    border-radius: 0 0 params.$substrate-border-radius params.$substrate-border-radius;
 
     &__title {
       font-weight: 600;
