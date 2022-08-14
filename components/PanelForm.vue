@@ -2,7 +2,7 @@
   <form class="form" @submit.prevent>
     <fieldset class="form-fieldset">
       <panel-form-field
-        v-for="({id, type = 'input', placeholder, label, required = true}, idx) of formFields"
+        v-for="({id, type = 'input', placeholder, label, required = true, error = ''}, idx) of formFields"
         :key="id"
         class="form-field"
         :class="{ 'form-field--last': idx + 1 === formFields.length}"
@@ -11,12 +11,12 @@
       >
         <template #label>{{ label }}</template>
         <template #input>
-          <panel-form-input :id="id" :type="type" :placeholder="placeholder" />
+          <panel-form-input :id="id" :type="type" :error="error" :placeholder="placeholder" />
         </template>
       </panel-form-field>
     </fieldset>
 
-    <panel-form-button class="form-button">
+    <panel-form-button enable class="form-button">
       Добавить товар
     </panel-form-button>
   </form>
@@ -31,7 +31,8 @@ export default {
         {
           id: 'name-of-product',
           label: 'Наименование товара',
-          placeholder: 'Введите наименование товара'
+          placeholder: 'Введите наименование товара',
+          error: 'ОШибка'
         },
         {
           id: 'product-description',
@@ -70,6 +71,7 @@ export default {
     padding: 0;
     margin: 0;
     border: none;
+    min-inline-size: auto;
   }
 
   &-field {

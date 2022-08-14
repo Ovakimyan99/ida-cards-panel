@@ -14,8 +14,7 @@
       class="form-input form-input--area"
     />
     <span class="form-input-error">
-      <!--  {{ error }}  -->
-      Поле является обязательным
+      {{ error }}
     </span>
   </div>
 </template>
@@ -61,9 +60,9 @@ export default {
   font-size: 12px;
   line-height: 1;
   outline: none;
-  width: calc(100% - 32px);
+  width: calc(100% - 34px);
   border: 1px solid transparent;
-  transition: background-color 0.3s ease-in;
+  transition: background-color 0.1s ease-in;
 
   &:focus {
     background-color: color.scale(colors.$substrate-fon, $blackness: 2%);
@@ -78,10 +77,14 @@ export default {
   }
 
   &--area {
-    max-width: 252px;
     width: 252px;
     min-width: calc(100% - 32px);
+    max-width: calc(100% - 32px);
     min-height: calc(108px - 20px);
+
+    @media (min-width: 1256px) {
+      max-width: 252px;
+    }
   }
 
   &-error {

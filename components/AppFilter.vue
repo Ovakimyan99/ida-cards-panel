@@ -1,5 +1,8 @@
 <template>
-  <div class="filter-wrapper" @click="changeShowFilter">
+  <div
+    class="substrate"
+    @click="changeShowFilter"
+  >
     <div class="filter-header">
       <span
         class="filter-active"
@@ -14,7 +17,7 @@
     </div>
     <ul
       v-show="showFilter"
-      class="filter-wrapper filter-list"
+      class="substrate filter-list"
       @click.stop
     >
       <li
@@ -103,19 +106,6 @@ export default {
 }
 
 .filter {
-  &-wrapper {
-    position: relative;
-    box-shadow: colors.$input-shadow;
-    border-radius: params.$substrate-border-radius;
-    background-color: colors.$substrate-fon;
-    display: block;
-    width: max-content;
-    padding: 10px 16px;
-    cursor: pointer;
-    margin: 0 0 16px auto;
-    z-index: 2;
-  }
-
   &-header {
     display: flex;
     align-items: center;
@@ -135,10 +125,14 @@ export default {
     margin: 6px 0 0 0;
     position: absolute;
     top: 100%;
-    right: 0;
     min-width: calc(100% - 32px);
     padding: 10px 0;
     cursor: default;
+    left: 0;
+
+    @media (min-width: 960px) {
+      right: 0;
+    }
 
     &__option {
       @extend %filter-select;
