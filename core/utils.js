@@ -47,11 +47,3 @@ export function nameFiltering(array, param = '') {
     return 0
   })
 }
-
-export function createCardID() {
-  return Date.now().toString()
-}
-
-export function toNumber(str) {
-  return +`${str}`.replace(/\D/g, '')
-}
