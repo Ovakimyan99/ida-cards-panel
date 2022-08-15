@@ -1,4 +1,5 @@
 # ida-cards-panel
+node version: v14.18.1
 
 ## Build Setup
 
