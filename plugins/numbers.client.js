@@ -1,10 +1,12 @@
+import { toNumber } from '@/core/utils'
+
 export default function (_, inject) {
   inject('number', {
     crushing
   })
 
   function crushing(val) {
-    const numbers = `${val}`.replace(/\D/g, '').split('')
+    const numbers = `${toNumber(val)}`.split('')
     if (numbers.length <= 3) return numbers.join('')
 
     let res = ''

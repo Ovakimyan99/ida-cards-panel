@@ -132,6 +132,7 @@ export default {
 
     @media (min-width: 960px) {
       right: 0;
+      left: auto;
     }
 
     &__option {

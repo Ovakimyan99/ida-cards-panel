@@ -2,9 +2,9 @@
   <main ref="main" class="panel-wrapper container">
     <!--  Form  -->
     <visibility-wrapper ref="formModal" class="panel-modal">
-      <aside class="panel-form-wrapper">
+      <aside class="panel-form-wrapper" @click="closeFormModal">
         <!--  Раздел добавления товаров  -->
-        <div class="panel-form-picker">
+        <div class="panel-form-picker" @click.stop>
           <div class="panel-form">
             <h2 class="panel-form__title">
               Добавление товара
@@ -39,41 +39,54 @@
 
       <!--   Список карт   -->
       <div class="cards-list-wrapper">
-        <ul class="cards-list">
-          <LazyPanelCard
-            v-for="{id, imgLink, descr, name, price} of productsList"
+        <transition-group name="list-complete" tag="ul" class="cards-list">
+          <lazy-panel-card
+            v-for="{id, imgLink, descr, name, price} of filteringProductList"
             :key="id"
+            class="cards-list__item"
             :name="name"
             :img-url="imgLink"
             :description="descr"
             :price="price"
+            @deleteCard="removeProductCard(id)"
           />
-        </ul>
+        </transition-group>
       </div>
     </div>
   </main>
 </template>
 
 <script>
-import { PRODUCTS_LIST } from 'assets/js/constants'
-import { storage } from '@/core/utils'
+import { FILTERING_MAX, FILTERING_MIN, FILTERING_NAMED, PRODUCTS_LIST } from 'static/constants'
+import { createCardID, storage, toNumber } from '@/core/utils'
 
 export default {
   name: 'IndexPage',
   data() {
     return {
       productsList: [],
+      filterSelect: null,
 
       filterSelected: '',
       filterOptions: [
-        { text: 'По цене min', value: 'min' },
-        { text: 'По цене max', value: 'max' },
-        { text: 'По наименованию', value: 'named' }
+        { text: 'По цене min', value: FILTERING_MIN },
+        { text: 'По цене max', value: FILTERING_MAX },
+        { text: 'По наименованию', value: FILTERING_NAMED }
       ]
+    }
+  },
+  computed: {
+    filteringProductList() {
+      if (this.filterSelect) return this.sortProductList()
+      return this.productsList
     }
   },
   watch: {
     filterSelected() {
+      storage(PRODUCTS_LIST, this.productsList)
+    },
+    productsList() {
+      if (this.filterSelect) return
       storage(PRODUCTS_LIST, this.productsList)
     }
   },
@@ -82,24 +95,49 @@ export default {
   },
   methods: {
     changeSelectedFilter(val) {
-      // val
+      this.filterSelect = val.value
     },
     async changeShowForm() {
       const formModal = this.$refs.formModal
       this.$refs.formBurger.changeState()
 
-      const modalResult = await formModal.open()
+      await formModal.open()
       this.$refs.formBurger.changeState()
-
-      if (modalResult) {
-        // add new card
-      }
     },
     closeFormModal() {
       this.$refs.formModal.close()
     },
-    submitForm (event) {
+    submitForm ({ name, description, imgLink, price }) {
+      this.productsList.push({
+        id: createCardID(),
+        name,
+        descr: description,
+        imgLink,
+        price
+      })
+
       this.$refs.formModal.success()
+    },
+    sortProductList() {
+      switch (this.filterSelect) {
+        case FILTERING_MAX:
+          return this.productsList.sort((a, b) => toNumber(b.price) - toNumber(a.price))
+        case FILTERING_MIN:
+          return this.productsList.sort((a, b) => toNumber(a.price) - toNumber(b.price))
+        case FILTERING_NAMED:
+          return this.productsList.sort((a, b) => {
+            const nameA = a.name.toLowerCase()
+            const nameB = b.name.toLowerCase()
+            if (nameA < nameB)
+              return -1
+            if (nameA > nameB)
+              return 1
+            return 0
+          })
+      }
+    },
+    removeProductCard(id) {
+      this.productsList = this.productsList.filter(card => card.id !== id)
     }
   }
 }
@@ -123,6 +161,15 @@ export default {
   top: 20px;
 }
 
+.list-complete-enter, .list-complete-leave-to,
+.list-complete-leave-active {
+  opacity: 0;
+  transform: translateY(30px);
+}
+.list-complete-leave-active {
+  position: absolute;
+}
+
 .panel {
   &-wrapper {
     margin: 32px auto;
@@ -132,6 +179,7 @@ export default {
   }
 
   &-modal {
+    transition: opacity 0.3s ease;
     @media (min-width: 960px) {
       display: block !important;
 
@@ -152,6 +200,7 @@ export default {
   }
 
   &-form-wrapper {
+    transition: all 0.3s ease;
     position: fixed;
     @extend %flex-column-center;
     background-color: color.adjust(colors.$text, $alpha: -0.4);
@@ -231,6 +280,7 @@ export default {
   }
 
   &-form-close-btn {
+    cursor: pointer;
     margin-top: 10px;
     box-shadow: colors.$substrate-shadow;
     background-color: colors.$substrate-fon;
@@ -274,6 +324,11 @@ export default {
 
   @media (min-width: 1256px) {
     grid-template-columns: repeat(3, 1fr);
+  }
+
+  &__item {
+    transition: all 1s;
+    display: inline-block;
   }
 
   &-wrapper {
