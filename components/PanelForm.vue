@@ -2,10 +2,10 @@
   <form class="form" @submit.prevent>
     <fieldset class="form-fieldset">
       <panel-form-field
-        v-for="({id, type = 'input', placeholder, label, required = true}, idx) of formFields"
+        v-for="([id, {type = 'input', placeholder, label, required = true}], idx) of fieldsEntries"
         :key="id"
         class="form-field"
-        :class="{ 'form-field--last': idx + 1 === formFields.length}"
+        :class="{ 'form-field--last': idx + 1 === fieldsEntries.length}"
         :input-id="id"
         :required="required"
       >
@@ -13,7 +13,7 @@
         <template #input>
           <panel-form-input
             :id="id"
-            v-model="formFields[idx].value"
+            v-model="formFields[id].value"
             :type="type"
             :error="getValidateField(id) || ''"
             :placeholder="placeholder"
@@ -28,74 +28,115 @@
       </panel-form-field>
     </fieldset>
 
-    <panel-form-button :enable="formValid" class="form-button">
+    <panel-form-button :enable="formReady" class="form-button" @click="submitForm">
       Добавить товар
     </panel-form-button>
   </form>
 </template>
 
 <script>
-import { REQUIRED, START_WITH } from 'assets/js/constants'
+import { REQUIRED, START_WITH, FORM_FOR_CARD } from 'assets/js/constants'
+import { storage } from '@/core/utils'
 
 export default {
   name: 'PanelForm',
+  fieldNames: {
+    NAME: 'name-of-product',
+    DESCRIPTION: 'product-description',
+    PRICE: 'production-cost',
+    IMG_LINK: 'img-link'
+  },
   data() {
     return {
       validate: {
-        'name-of-product': {
+        [this.$options.fieldNames.NAME]: {
           type: REQUIRED,
           error: '',
-          validate: false
+          valid: false
         },
-        'img-link': {
+        [this.$options.fieldNames.IMG_LINK]: {
           type: [REQUIRED, START_WITH],
           params: {
             [START_WITH]: 'http'
           },
           error: '',
-          validate: false
+          valid: false
         },
-        'production-cost': {
+        [this.$options.fieldNames.PRICE]: {
           type: REQUIRED,
           error: '',
-          validate: false
+          valid: false
         }
       },
-      formValid: false,
 
-      formFields: [
-        {
-          id: 'name-of-product',
+      formFields: {
+        [this.$options.fieldNames.NAME]: {
           label: 'Наименование товара',
           placeholder: 'Введите наименование товара',
           value: ''
         },
-        {
-          id: 'product-description',
+        [this.$options.fieldNames.DESCRIPTION]: {
           type: 'textarea',
           label: 'Описание товара',
           placeholder: 'Введите описание товара',
           required: false,
           value: ''
         },
-        {
-          id: 'img-link',
+        [this.$options.fieldNames.IMG_LINK]: {
           label: 'Ссылка на изображение товара',
           placeholder: 'Введите ссылку',
           value: ''
         },
-        {
+        [this.$options.fieldNames.PRICE]: {
           id: 'production-cost',
           label: 'Цена товара',
           placeholder: 'Введите цену',
           value: ''
         }
-      ]
+      }
     }
   },
+  computed: {
+    fieldsEntries() {
+      return Object.entries(this.formFields)
+    },
+    validateValues() {
+      return Object.values(this.validate)
+    },
+    formReady() {
+      return this.validateValues.every(field => field.valid === true)
+    }
+  },
+  watch: {
+    formFields: {
+      handler() {
+        this.setStorageFormValues()
+      },
+      deep: true
+    }
+  },
+  mounted () {
+    this.fillFromStorage()
+    this.validationOfFilledFields()
+  },
   methods: {
+    submitForm() {
+      if (!this.formReady) return
+
+      const fieldNames = this.$options.fieldNames
+      this.$emit('submit', {
+        name: this.formFields[fieldNames.NAME].value,
+        description: this.formFields[fieldNames.DESCRIPTION].value,
+        imgLink: this.formFields[fieldNames.IMG_LINK].value,
+        price: this.formFields[fieldNames.PRICE].value
+      })
+      this.clearFormFields()
+      this.resetValidate()
+    },
     changeInput(id) {
       const field = this.findFormField(id)
+
+      // this.setStorageFormValues()
 
       if (id === 'production-cost') {
         field.value = this.$number.crushing(field.value)
@@ -108,23 +149,47 @@ export default {
       const field = this.findFormField(id)
 
       const { valid, msg } = this.$validate({
-        type: validate.type,
         value: field.value
       }, { ...validate })
 
       validate.error = msg
       validate.valid = valid
-
-      this.defineValidForm()
     },
     findFormField(id) {
-      return this.formFields.find(field => field.id === id)
+      return this.formFields[id] || {}
     },
     getValidateField(id) {
       return this.validate[id]?.error || ''
     },
-    defineValidForm() {
-      this.formValid = Object.values(this.validate).every(field => field.valid === true)
+    clearFormFields() {
+      this.fieldsEntries.forEach(([_, field]) => {
+        field.value = ''
+      })
+      // this.setStorageFormValues()
+    },
+    fillFromStorage() {
+      const fields = storage(FORM_FOR_CARD) || []
+      fields.forEach(({ id, value }) => {
+        this.formFields[id].value = value
+      })
+    },
+    resetValidate() {
+      this.validateValues.forEach(field => { field.valid = false })
+    },
+    validationOfFilledFields() {
+      Object.entries(this.formFields).forEach(([fieldId, field]) => {
+        if (field.value && this.validate[fieldId]) {
+          this.validateInput(fieldId)
+        }
+      })
+    },
+    setStorageFormValues() {
+      storage(FORM_FOR_CARD,
+        this.fieldsEntries.map(field => ({
+          id: field[0],
+          value: field[1].value
+        }))
+      )
     }
   }
 }

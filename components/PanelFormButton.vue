@@ -2,7 +2,7 @@
   <button
     :class="{ enable }"
     class="button"
-    @click="$emit('click')"
+    @click.prevent="$emit('click')"
   >
     <slot />
   </button>

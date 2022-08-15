@@ -1,24 +1,27 @@
 <template>
   <main ref="main" class="panel-wrapper container">
-    <aside class="panel-form-wrapper">
-      <!--  Раздел добавления товаров  -->
-      <div class="panel-form-picker">
-        <div class="panel-form">
-          <h2 class="panel-form__title">
-            Добавление товара
-          </h2>
+    <!--  Form  -->
+    <visibility-wrapper ref="formModal" class="panel-modal">
+      <aside class="panel-form-wrapper">
+        <!--  Раздел добавления товаров  -->
+        <div class="panel-form-picker">
+          <div class="panel-form">
+            <h2 class="panel-form__title">
+              Добавление товара
+            </h2>
 
-          <!--  Форма добавления товаров  -->
-          <panel-form />
+            <!--  Форма добавления товаров  -->
+            <panel-form @submit="submitForm" />
+          </div>
+
+          <panel-form-button class="panel-form-close-btn" @click="closeFormModal">
+            Закрыть форму
+          </panel-form-button>
         </div>
+      </aside>
+    </visibility-wrapper>
 
-        <panel-form-button class="panel-form-close-btn">
-          Закрыть форму
-        </panel-form-button>
-      </div>
-    </aside>
-
-    <!--  Товары  -->
+    <!--  Products  -->
     <div class="panel-products">
       <!--   Отображение фильтра   -->
       <app-filter
@@ -29,6 +32,7 @@
 
       <!--   Мобилка: Бургер открытия формы   -->
       <app-burger
+        ref="formBurger"
         class="panel__form-show"
         @click="changeShowForm"
       />
@@ -51,127 +55,51 @@
 </template>
 
 <script>
-import { disableScroll, enablesScroll } from '@/core/windowScroll'
+import { PRODUCTS_LIST } from 'assets/js/constants'
+import { storage } from '@/core/utils'
 
 export default {
   name: 'IndexPage',
   data() {
     return {
-      productsList: [
-        {
-          id: 1,
-          imgLink: 'https://i.pinimg.com/736x/f4/d2/96/f4d2961b652880be432fb9580891ed62.jpg',
-          name: 'Это котик',
-          descr: 'Описание скоро сделаем длинным',
-          price: 10000
-        },
-        {
-          id: 2,
-          imgLink: 'https://icdn.lenta.ru/images/2021/12/30/17/20211230175542538/square_1280_9852fabcde7147edee00deeafde2a2e0.jpg',
-          name: 'Тигр',
-          descr: 'ываджлдоыаволджыва вылдорлджыва',
-          price: 10000
-        },
-        {
-          id: 3,
-          imgLink: 'https://meloman.ru/media/upload/photos/Bethoven_3.820x350.jpg',
-          name: 'Бетховен',
-          descr: '',
-          price: 10000
-        },
-        {
-          id: 4,
-          imgLink: 'https://radior.lt/wp-content/uploads/2021/04/7-2.jpg',
-          name: 'Муххамад Али',
-          descr: '',
-          price: 10000
-        },
-        {
-          id: 5,
-          imgLink: 'https://2bitcoins.ru/wp-content/uploads/2021/08/peterson1.jpg',
-          name: 'Джордан Питерсон',
-          descr: '',
-          price: 10000
-        },
-        {
-          id: 6,
-          imgLink: 'https://neoclassica.ru/wp-content/uploads/2021/12/ludovico-einaudi-underwater-new-album-announce.jpeg',
-          name: 'Людовико Эйнауди',
-          descr: '',
-          price: 10000
-        },
-        {
-          id: 7,
-          imgLink: 'https://i.pinimg.com/736x/f4/d2/96/f4d2961b652880be432fb9580891ed62.jpg',
-          name: 'Это котик',
-          descr: 'Описание скоро сделаем длинным',
-          price: 10000
-        },
-        {
-          id: 8,
-          imgLink: 'https://icdn.lenta.ru/images/2021/12/30/17/20211230175542538/square_1280_9852fabcde7147edee00deeafde2a2e0.jpg',
-          name: 'Тигр',
-          descr: 'ываджлдоыаволджыва вылдорлджыва',
-          price: 10000
-        },
-        {
-          id: 9,
-          imgLink: 'https://meloman.ru/media/upload/photos/Bethoven_3.820x350.jpg',
-          name: 'Бетховен',
-          descr: '',
-          price: 10000
-        },
-        {
-          id: 10,
-          imgLink: 'https://radior.lt/wp-content/uploads/2021/04/7-2.jpg',
-          name: 'Муххамад Али',
-          descr: '',
-          price: 10000
-        },
-        {
-          id: 11,
-          imgLink: 'https://2bitcoins.ru/wp-content/uploads/2021/08/peterson1.jpg',
-          name: 'Джордан Питерсон',
-          descr: '',
-          price: 10000
-        },
-        {
-          id: 12,
-          imgLink: 'https://neoclassica.ru/wp-content/uploads/2021/12/ludovico-einaudi-underwater-new-album-announce.jpeg',
-          name: 'Людовико Эйнауди',
-          descr: '',
-          price: 10000
-        }
-      ],
+      productsList: [],
 
       filterSelected: '',
       filterOptions: [
         { text: 'По цене min', value: 'min' },
         { text: 'По цене max', value: 'max' },
         { text: 'По наименованию', value: 'named' }
-      ],
-
-      showForm: true
+      ]
     }
   },
   watch: {
     filterSelected() {
-      // this.filterSelected
-    },
-    showForm() {
-      if (this.showForm) {
-        enablesScroll()
-      } else {
-        disableScroll()
-      }
+      storage(PRODUCTS_LIST, this.productsList)
     }
+  },
+  mounted () {
+    this.productsList = storage(PRODUCTS_LIST) || []
   },
   methods: {
     changeSelectedFilter(val) {
       // val
     },
-    changeShowForm() {
-      this.showForm = !this.showForm
+    async changeShowForm() {
+      const formModal = this.$refs.formModal
+      this.$refs.formBurger.changeState()
+
+      const modalResult = await formModal.open()
+      this.$refs.formBurger.changeState()
+
+      if (modalResult) {
+        // add new card
+      }
+    },
+    closeFormModal() {
+      this.$refs.formModal.close()
+    },
+    submitForm (event) {
+      this.$refs.formModal.success()
     }
   }
 }
@@ -190,6 +118,11 @@ export default {
   flex-direction: column;
 }
 
+%sticky-menu {
+  position: sticky;
+  top: 20px;
+}
+
 .panel {
   &-wrapper {
     margin: 32px auto;
@@ -198,9 +131,22 @@ export default {
     align-items: flex-start;
   }
 
+  &-modal {
+    @media (min-width: 960px) {
+      display: block !important;
+
+      position: sticky;
+      top: 32px;
+    }
+  }
+
   &-filter {
+    @extend %sticky-menu;
+
     @media (min-width: 960px) {
       display: block;
+      position: relative;
+      top: 0;
       margin-left: auto;
     }
   }
@@ -217,8 +163,7 @@ export default {
     left: 0;
 
     @media (min-width: 960px) {
-      position: sticky;
-      top: 32px;
+      position: relative;
       display: block;
       padding: 0;
       height: auto;
@@ -273,11 +218,12 @@ export default {
   }
 
   &__form-show {
+    @extend %sticky-menu;
     box-shadow: colors.$input-shadow;
     background-color: colors.$substrate-fon;
     border-radius: params.$substrate-border-radius;
-    position: relative;
     float: right;
+    z-index: 3;
 
     @media (min-width: 960px) {
       display: none;

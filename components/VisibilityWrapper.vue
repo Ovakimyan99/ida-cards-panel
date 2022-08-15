@@ -1,30 +1,49 @@
 <template>
-  <div @click="$emit('click')">
+  <div v-show="showModal">
     <slot />
   </div>
 </template>
 
 <script>
+import { disableScroll, enablesScroll } from '@/core/windowScroll'
+
 export default {
   name: 'VisibilityWrapper',
   showController: {
     resolve: null
   },
+  data() {
+    return {
+      showModal: false
+    }
+  },
   methods: {
     open() {
+      disableScroll()
+      this.showModal = true
+      let res
       const promise = new Promise(resolve => {
-        this.$options.showController.resolve = resolve
+        res = resolve
       })
 
+      this.$options.showController.resolve = res
       return promise
     },
     success() {
-      this.$emit('visible', true)
+      if (!this.$options.showController.resolve) return
+
+      this.hideModal()
       this.$options.showController.resolve(true)
     },
     close() {
-      this.$emit('visible', false)
+      if (!this.$options.showController.resolve) return
+
+      this.hideModal()
       this.$options.showController.resolve(false)
+    },
+    hideModal() {
+      this.showModal = false
+      enablesScroll()
     }
   }
 }

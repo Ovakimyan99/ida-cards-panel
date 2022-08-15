@@ -1,5 +1,5 @@
 <template>
-  <div class="app-burger-wrapper" @click="changeState">
+  <div class="app-burger-wrapper" @click="$emit('click')">
     <div class="app-burger" :class="{ active }">
       <span class="app-burger-line app-burger__top" />
       <span class="app-burger-line app-burger__middle" />
@@ -18,7 +18,6 @@ export default {
   },
   methods: {
     changeState() {
-      this.$emit('click')
       this.active = !this.active
     }
   }

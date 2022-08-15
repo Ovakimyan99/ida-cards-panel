@@ -1,3 +1,7 @@
 // VALIDATION TYPES
 export const REQUIRED = 'REQUIRED'
 export const START_WITH = 'START_WITH'
+
+// STORAGE
+export const FORM_FOR_CARD = 'FORM_FOR_CARD'
+export const PRODUCTS_LIST = 'PRODUCTS_LIST'

@@ -28,12 +28,14 @@ export default function (context, inject) {
     })
   }
 
-  function validate({ value, type: types }, args) {
+  function validate({ value }, args) {
+    let types = args.type
     if (typeof types === 'string') types = [types]
 
-    let resValidate = ''
+    let resValidate = { valid: true }
+
     for (const type of types) {
-      if (resValidate) break
+      if (!resValidate.valid) break
 
       switch (type) {
         case REQUIRED:

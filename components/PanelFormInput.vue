@@ -15,6 +15,8 @@
       :id="id"
       :placeholder="placeholder"
       class="form-input form-input--area"
+      :value="value"
+      @input="$emit('input', $event.target.value)"
     />
     <span v-if="error" class="form-input-error">
       <slot name="error" />
