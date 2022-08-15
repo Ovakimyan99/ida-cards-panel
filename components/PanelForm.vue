@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import { REQUIRED, START_WITH, FORM_FOR_CARD } from 'assets/js/constants'
+import { REQUIRED, START_WITH, FORM_FOR_CARD } from 'static/constants'
 import { storage } from '@/core/utils'
 
 export default {
@@ -130,13 +130,12 @@ export default {
         imgLink: this.formFields[fieldNames.IMG_LINK].value,
         price: this.formFields[fieldNames.PRICE].value
       })
+
       this.clearFormFields()
       this.resetValidate()
     },
     changeInput(id) {
       const field = this.findFormField(id)
-
-      // this.setStorageFormValues()
 
       if (id === 'production-cost') {
         field.value = this.$number.crushing(field.value)
@@ -165,7 +164,6 @@ export default {
       this.fieldsEntries.forEach(([_, field]) => {
         field.value = ''
       })
-      // this.setStorageFormValues()
     },
     fillFromStorage() {
       const fields = storage(FORM_FOR_CARD) || []

@@ -1,4 +1,4 @@
-import { REQUIRED, START_WITH } from 'assets/js/constants'
+import { REQUIRED, START_WITH } from 'static/constants'
 
 export default function (context, inject) {
   inject('validate', validate)

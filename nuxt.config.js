@@ -29,6 +29,10 @@ export default {
     '~/plugins/validate.client.js'
   ],
 
+  modules: [
+    '@nuxt/image'
+  ],
+
   buildModules: [
     // https://go.nuxtjs.dev/eslint
     '@nuxtjs/eslint-module'

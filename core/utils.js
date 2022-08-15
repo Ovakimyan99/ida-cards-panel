@@ -12,3 +12,11 @@ export function clearStorage(key, all = false) {
   }
   localStorage.removeItem(key)
 }
+
+export function createCardID() {
+  return Date.now().toString()
+}
+
+export function toNumber(str) {
+  return +`${str}`.replace(/\D/g, '')
+}
