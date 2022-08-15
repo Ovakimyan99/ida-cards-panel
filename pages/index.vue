@@ -1,21 +1,27 @@
 <template>
   <main ref="main" class="panel-wrapper container">
-    <aside class="panel-form-wrapper">
-      <div class="panel-form-picker">
+    <!--  Form  -->
+    <visibility-wrapper ref="formModal" class="panel-modal">
+      <aside class="panel-form-wrapper" @click="closeFormModal">
         <!--  Раздел добавления товаров  -->
-        <div class="panel-form">
-          <h2 class="panel-form__title">
-            Добавление товара
-          </h2>
-          <!--  Форма добавления товаров  -->
-          <panel-form />
+        <div class="panel-form-picker" @click.stop>
+          <div class="panel-form">
+            <h2 class="panel-form__title">
+              Добавление товара
+            </h2>
+
+            <!--  Форма добавления товаров  -->
+            <panel-form @submit="submitForm" />
+          </div>
+
+          <panel-form-button class="panel-form-close-btn" @click="closeFormModal">
+            Закрыть форму
+          </panel-form-button>
         </div>
-        <panel-form-button class="panel-form-close-btn">
-          Закрыть форму
-        </panel-form-button>
-      </div>
-    </aside>
-    <!--  Товары  -->
+      </aside>
+    </visibility-wrapper>
+
+    <!--  Products  -->
     <div class="panel-products">
       <!--   Отображение фильтра   -->
       <app-filter
@@ -23,150 +29,115 @@
         :options="filterOptions"
         @selectedFilter="changeSelectedFilter"
       />
+
       <!--   Мобилка: Бургер открытия формы   -->
       <app-burger
+        ref="formBurger"
         class="panel__form-show"
         @click="changeShowForm"
       />
+
       <!--   Список карт   -->
       <div class="cards-list-wrapper">
-        <ul class="cards-list">
-          <LazyPanelCard
-            v-for="{id, imgLink, descr, name, price} of productsList"
+        <transition-group name="list-complete" tag="ul" class="cards-list">
+          <lazy-panel-card
+            v-for="{id, imgLink, descr, name, price} of filteringProductList"
             :key="id"
+            class="cards-list__item"
             :name="name"
             :img-url="imgLink"
             :description="descr"
             :price="price"
+            @deleteCard="removeProductCard(id)"
           />
-        </ul>
+        </transition-group>
       </div>
     </div>
   </main>
 </template>
 
 <script>
-import { disableScroll, enablesScroll } from 'assets/js/windowScroll'
+import { FILTERING_MAX, FILTERING_MIN, FILTERING_NAMED, PRODUCTS_LIST } from 'static/constants'
+import { createCardID, storage, toNumber } from '@/core/utils'
 
 export default {
   name: 'IndexPage',
   data() {
     return {
-      productsList: [
-        {
-          id: 1,
-          imgLink: 'https://i.pinimg.com/736x/f4/d2/96/f4d2961b652880be432fb9580891ed62.jpg',
-          name: 'Это котик',
-          descr: 'Описание скоро сделаем длинным',
-          price: 10000
-        },
-        {
-          id: 2,
-          imgLink: 'https://icdn.lenta.ru/images/2021/12/30/17/20211230175542538/square_1280_9852fabcde7147edee00deeafde2a2e0.jpg',
-          name: 'Тигр',
-          descr: 'ываджлдоыаволджыва вылдорлджыва',
-          price: 10000
-        },
-        {
-          id: 3,
-          imgLink: 'https://meloman.ru/media/upload/photos/Bethoven_3.820x350.jpg',
-          name: 'Бетховен',
-          descr: '',
-          price: 10000
-        },
-        {
-          id: 4,
-          imgLink: 'https://radior.lt/wp-content/uploads/2021/04/7-2.jpg',
-          name: 'Муххамад Али',
-          descr: '',
-          price: 10000
-        },
-        {
-          id: 5,
-          imgLink: 'https://2bitcoins.ru/wp-content/uploads/2021/08/peterson1.jpg',
-          name: 'Джордан Питерсон',
-          descr: '',
-          price: 10000
-        },
-        {
-          id: 6,
-          imgLink: 'https://neoclassica.ru/wp-content/uploads/2021/12/ludovico-einaudi-underwater-new-album-announce.jpeg',
-          name: 'Людовико Эйнауди',
-          descr: '',
-          price: 10000
-        },
-        {
-          id: 7,
-          imgLink: 'https://i.pinimg.com/736x/f4/d2/96/f4d2961b652880be432fb9580891ed62.jpg',
-          name: 'Это котик',
-          descr: 'Описание скоро сделаем длинным',
-          price: 10000
-        },
-        {
-          id: 8,
-          imgLink: 'https://icdn.lenta.ru/images/2021/12/30/17/20211230175542538/square_1280_9852fabcde7147edee00deeafde2a2e0.jpg',
-          name: 'Тигр',
-          descr: 'ываджлдоыаволджыва вылдорлджыва',
-          price: 10000
-        },
-        {
-          id: 9,
-          imgLink: 'https://meloman.ru/media/upload/photos/Bethoven_3.820x350.jpg',
-          name: 'Бетховен',
-          descr: '',
-          price: 10000
-        },
-        {
-          id: 10,
-          imgLink: 'https://radior.lt/wp-content/uploads/2021/04/7-2.jpg',
-          name: 'Муххамад Али',
-          descr: '',
-          price: 10000
-        },
-        {
-          id: 11,
-          imgLink: 'https://2bitcoins.ru/wp-content/uploads/2021/08/peterson1.jpg',
-          name: 'Джордан Питерсон',
-          descr: '',
-          price: 10000
-        },
-        {
-          id: 12,
-          imgLink: 'https://neoclassica.ru/wp-content/uploads/2021/12/ludovico-einaudi-underwater-new-album-announce.jpeg',
-          name: 'Людовико Эйнауди',
-          descr: '',
-          price: 10000
-        }
-      ],
+      productsList: [],
+      filterSelect: null,
 
       filterSelected: '',
       filterOptions: [
-        { text: 'По цене min', value: 'min' },
-        { text: 'По цене max', value: 'max' },
-        { text: 'По наименованию', value: 'named' }
-      ],
-
-      showForm: true
+        { text: 'По цене min', value: FILTERING_MIN },
+        { text: 'По цене max', value: FILTERING_MAX },
+        { text: 'По наименованию', value: FILTERING_NAMED }
+      ]
+    }
+  },
+  computed: {
+    filteringProductList() {
+      if (this.filterSelect) return this.sortProductList()
+      return this.productsList
     }
   },
   watch: {
     filterSelected() {
-      // this.filterSelected
+      storage(PRODUCTS_LIST, this.productsList)
     },
-    showForm() {
-      if (this.showForm) {
-        enablesScroll()
-      } else {
-        disableScroll()
-      }
+    productsList() {
+      if (this.filterSelect) return
+      storage(PRODUCTS_LIST, this.productsList)
     }
+  },
+  mounted () {
+    this.productsList = storage(PRODUCTS_LIST) || []
   },
   methods: {
     changeSelectedFilter(val) {
-      // val
+      this.filterSelect = val.value
     },
-    changeShowForm() {
-      this.showForm = !this.showForm
+    async changeShowForm() {
+      const formModal = this.$refs.formModal
+      this.$refs.formBurger.changeState()
+
+      await formModal.open()
+      this.$refs.formBurger.changeState()
+    },
+    closeFormModal() {
+      this.$refs.formModal.close()
+    },
+    submitForm ({ name, description, imgLink, price }) {
+      this.productsList.push({
+        id: createCardID(),
+        name,
+        descr: description,
+        imgLink,
+        price
+      })
+
+      this.$refs.formModal.success()
+    },
+    sortProductList() {
+      switch (this.filterSelect) {
+        case FILTERING_MAX:
+          return this.productsList.sort((a, b) => toNumber(b.price) - toNumber(a.price))
+        case FILTERING_MIN:
+          return this.productsList.sort((a, b) => toNumber(a.price) - toNumber(b.price))
+        case FILTERING_NAMED:
+          return this.productsList.sort((a, b) => {
+            const nameA = a.name.toLowerCase()
+            const nameB = b.name.toLowerCase()
+            if (nameA < nameB)
+              return -1
+            if (nameA > nameB)
+              return 1
+            return 0
+          })
+      }
+    },
+    removeProductCard(id) {
+      this.productsList = this.productsList.filter(card => card.id !== id)
     }
   }
 }
@@ -185,6 +156,20 @@ export default {
   flex-direction: column;
 }
 
+%sticky-menu {
+  position: sticky;
+  top: 20px;
+}
+
+.list-complete-enter, .list-complete-leave-to,
+.list-complete-leave-active {
+  opacity: 0;
+  transform: translateY(30px);
+}
+.list-complete-leave-active {
+  position: absolute;
+}
+
 .panel {
   &-wrapper {
     margin: 32px auto;
@@ -193,14 +178,29 @@ export default {
     align-items: flex-start;
   }
 
+  &-modal {
+    transition: opacity 0.3s ease;
+    @media (min-width: 960px) {
+      display: block !important;
+
+      position: sticky;
+      top: 32px;
+    }
+  }
+
   &-filter {
+    @extend %sticky-menu;
+
     @media (min-width: 960px) {
       display: block;
+      position: relative;
+      top: 0;
       margin-left: auto;
     }
   }
 
   &-form-wrapper {
+    transition: all 0.3s ease;
     position: fixed;
     @extend %flex-column-center;
     background-color: color.adjust(colors.$text, $alpha: -0.4);
@@ -212,8 +212,7 @@ export default {
     left: 0;
 
     @media (min-width: 960px) {
-      position: sticky;
-      top: 32px;
+      position: relative;
       display: block;
       padding: 0;
       height: auto;
@@ -268,11 +267,12 @@ export default {
   }
 
   &__form-show {
+    @extend %sticky-menu;
     box-shadow: colors.$input-shadow;
     background-color: colors.$substrate-fon;
     border-radius: params.$substrate-border-radius;
-    position: relative;
     float: right;
+    z-index: 3;
 
     @media (min-width: 960px) {
       display: none;
@@ -280,6 +280,7 @@ export default {
   }
 
   &-form-close-btn {
+    cursor: pointer;
     margin-top: 10px;
     box-shadow: colors.$substrate-shadow;
     background-color: colors.$substrate-fon;
@@ -323,6 +324,11 @@ export default {
 
   @media (min-width: 1256px) {
     grid-template-columns: repeat(3, 1fr);
+  }
+
+  &__item {
+    transition: all 1s;
+    display: inline-block;
   }
 
   &-wrapper {

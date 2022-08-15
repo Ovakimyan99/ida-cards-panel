@@ -1,10 +1,18 @@
 <template>
   <li class="card">
-    <button class="card-del">
+    <button class="card-del" @click="$emit('deleteCard')">
       <img class="card-del__img" src="@/assets/images/delete.svg" alt="delete card" title="delete card">
     </button>
     <picture class="card-img-wrapper">
-      <img class="card-img" :src="imgUrl" :alt="name" :title="name">
+      <app-loader v-if="hideImg" />
+      <nuxt-img
+        v-show="!hideImg"
+        class="card-img"
+        :src="imgUrl"
+        :alt="name"
+        :title="name"
+        @load="doSomethingOnLoad"
+      />
     </picture>
     <span class="card-info">
       <span class="card-info__title">{{ name }}</span>
@@ -14,12 +22,14 @@
       >
         {{ description }}
       </p>
-      <span class="card-info__price">{{ formattedPrice(price) }} руб.</span>
+      <span class="card-info__price">{{ $number.crushing(price) }} руб.</span>
     </span>
   </li>
 </template>
 
 <script>
+import { toNumber } from '@/core/utils'
+
 export default {
   name: 'PanelCard',
   props: {
@@ -36,13 +46,22 @@ export default {
       default: ''
     },
     price: {
-      type: Number,
-      required: true
+      type: [Number, String],
+      required: true,
+      validator(value) {
+        return typeof toNumber(value) === 'number'
+      }
+    }
+  },
+  data() {
+    return {
+      hideImg: true
     }
   },
   methods: {
-    formattedPrice(val) {
-      return val
+    doSomethingOnLoad() {
+      this.hideImg = false
+      console.log('load img')
     }
   }
 }

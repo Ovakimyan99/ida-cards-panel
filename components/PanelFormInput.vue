@@ -6,15 +6,20 @@
       :placeholder="placeholder"
       :class="{ error }"
       class="form-input"
+      :value="value"
+      @input="$emit('input', $event.target.value)"
+      @blur="$emit('blur')"
     >
     <textarea
       v-else-if="type === 'textarea'"
       :id="id"
       :placeholder="placeholder"
       class="form-input form-input--area"
+      :value="value"
+      @input="$emit('input', $event.target.value)"
     />
-    <span class="form-input-error">
-      {{ error }}
+    <span v-if="error" class="form-input-error">
+      <slot name="error" />
     </span>
   </div>
 </template>
@@ -26,7 +31,7 @@ export default {
     type: {
       type: String,
       default: 'input',
-      validator(value) {
+      validator (value) {
         return ['input', 'textarea'].includes(value)
       }
     },
@@ -37,6 +42,10 @@ export default {
     placeholder: {
       type: String,
       default: 'Заполните поле'
+    },
+    value: {
+      type: String,
+      default: ''
     },
     error: {
       type: String,
