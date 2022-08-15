@@ -15,7 +15,7 @@
             :id="id"
             v-model="formFields[id].value"
             :type="type"
-            :error="getValidateField(id) || ''"
+            :error="getValidateField(id)"
             :placeholder="placeholder"
             @input="changeInput(id)"
             @blur="validateInput(id)"
@@ -137,7 +137,7 @@ export default {
     changeInput(id) {
       const field = this.findFormField(id)
 
-      if (id === 'production-cost') {
+      if (id === this.$options.fieldNames.PRICE) {
         field.value = this.$number.crushing(field.value)
       }
     },

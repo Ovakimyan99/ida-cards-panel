@@ -1,5 +1,5 @@
 <template>
-  <main ref="main" class="panel-wrapper container">
+  <main class="panel-wrapper container">
     <!--  Form  -->
     <visibility-wrapper ref="formModal" class="panel-modal">
       <aside class="panel-form-wrapper" @click="closeFormModal">
@@ -58,7 +58,13 @@
 
 <script>
 import { FILTERING_MAX, FILTERING_MIN, FILTERING_NAMED, PRODUCTS_LIST } from 'static/constants'
-import { createCardID, storage, toNumber } from '@/core/utils'
+import {
+  ascendingFiltering,
+  createCardID,
+  descendingFiltering,
+  nameFiltering,
+  storage
+} from '@/core/utils'
 
 export default {
   name: 'IndexPage',
@@ -98,10 +104,9 @@ export default {
       this.filterSelect = val.value
     },
     async changeShowForm() {
-      const formModal = this.$refs.formModal
       this.$refs.formBurger.changeState()
 
-      await formModal.open()
+      await this.$refs.formModal.open()
       this.$refs.formBurger.changeState()
     },
     closeFormModal() {
@@ -121,19 +126,11 @@ export default {
     sortProductList() {
       switch (this.filterSelect) {
         case FILTERING_MAX:
-          return this.productsList.sort((a, b) => toNumber(b.price) - toNumber(a.price))
+          return ascendingFiltering(this.productsList, 'price')
         case FILTERING_MIN:
-          return this.productsList.sort((a, b) => toNumber(a.price) - toNumber(b.price))
+          return descendingFiltering(this.productsList, 'price')
         case FILTERING_NAMED:
-          return this.productsList.sort((a, b) => {
-            const nameA = a.name.toLowerCase()
-            const nameB = b.name.toLowerCase()
-            if (nameA < nameB)
-              return -1
-            if (nameA > nameB)
-              return 1
-            return 0
-          })
+          return nameFiltering(this.productsList, 'name')
       }
     },
     removeProductCard(id) {
