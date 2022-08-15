@@ -6,6 +6,7 @@ node version: v14.18.1
 ```bash
 # install dependencies
 $ npm install
+node version: 14.18.1
 
 # serve with hot reload at localhost:3000
 $ npm run dev

@@ -61,7 +61,6 @@ export default {
   methods: {
     doSomethingOnLoad() {
       this.hideImg = false
-      console.log('load img')
     }
   }
 }
